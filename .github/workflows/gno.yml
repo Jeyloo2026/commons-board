@@ -1,5 +1,5 @@
 name: Gno tests
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
 jobs:
@@ -24,3 +24,23 @@ jobs:
       - name: Test realm
         working-directory: commonsboard
         run: gno test -root-dir "$RUNNER_TEMP/gno/source" .
+      - uses: actions/setup-go@v6
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          go-version-file: ${{ runner.temp }}/gno/source/go.mod
+          cache: false
+      - name: Build Windows testnet client
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GOOS: windows
+          GOARCH: amd64
+          CGO_ENABLED: 0
+        run: |
+          cd "$RUNNER_TEMP/gno/source"
+          go build -o "$RUNNER_TEMP/gnokey.exe" ./gno.land/cmd/gnokey
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: gnokey-v1.8.0-windows-amd64
+          path: ${{ runner.temp }}/gnokey.exe
+          retention-days: 1
