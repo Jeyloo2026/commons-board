@@ -2,7 +2,7 @@
 
 Commons Board helps a small community decide what to do next. A Gno realm stores proposals, voting deadlines, and public yes/no totals. The address that owns the realm namespace admits members, and every admitted member can create a proposal and vote once per proposal.
 
-[Try the interactive preview](https://jeyloo2026.github.io/commons-board/). The preview simulates votes in the browser. Its data resets when the page reloads.
+[Try the interactive preview](https://jeyloo2026.github.io/commons-board/). Switch between Ada and Lin to try voting as two members, or create a one-minute proposal to see its outcome move into the decision archive. Demo proposals and votes are stored in your browser.
 
 ## Try locally
 

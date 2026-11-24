@@ -3,115 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light">
-<title>Commons Board · Voting demo</title>
-<style>
-:root { color:#192c43; background:#edf3fa; font:16px/1.55 system-ui,sans-serif; }
-* { box-sizing:border-box; }
-body { margin:0; }
-main { width:min(100% - 2rem, 55rem); margin:clamp(2rem,8vw,6rem) auto; }
-header { border-block-end:2px solid #192c43; padding-block-end:1.4rem; }
-h1,h2 { font-family:Georgia,serif; line-height:1.05; margin:.25em 0; }
-h1 { font-size:clamp(2.8rem,9vw,5rem); letter-spacing:-.05em; }
-h2 { font-size:clamp(1.6rem,5vw,2.4rem); }
-p { margin:.6rem 0; }
-.muted { color:#465a71; }
-.row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
-form,.poll { padding:1.25rem 0; border-block-end:1px solid #a8b9cc; }
-input,select,button { font:inherit; min-height:44px; padding:.55rem .8rem; border:1px solid #536b86; border-radius:.25rem; background:#fff; color:inherit; }
-input { width:min(100%,27rem); }
-button { cursor:pointer; background:#203d67; color:white; }
-button:disabled { cursor:default; background:#526376; }
-:focus-visible { outline:3px solid #2d66ad; outline-offset:3px; }
-meter { width:100%; height:1.2rem; accent-color:#203d67; }
-#status { min-height:1.55em; }
-a { color:#234e86; }
-</style>
+<title>Commons Board · Community decisions</title>
+<link rel="stylesheet" href="board.css">
+<script defer src="board.js"></script>
 </head>
 <body>
+<aside class="sidebar">
+  <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">◈</span> Commons<span>Board</span></a>
+  <span class="workspace">Open Source Guild</span>
+  <nav aria-label="Proposal views">
+    <button type="button" data-view="all" aria-pressed="true"><span aria-hidden="true">▤</span> Proposal board</button>
+    <button type="button" data-view="closed" aria-pressed="false"><span aria-hidden="true">◷</span> Decision archive</button>
+    <button type="button" data-view="mine" aria-pressed="false"><span aria-hidden="true">✓</span> My votes</button>
+  </nav>
+  <a class="source" href="https://github.com/Jeyloo2026/commons-board">Project source ↗</a>
+</aside>
 <main>
-  <header>
-    <h1>Commons Board</h1>
-    <p>Propose an idea and vote on what your community does next.</p>
-    <p class="muted">Interactive browser demo · Votes in this preview are simulated.</p>
+  <div class="toolbar">
+    <span class="preview">● Browser preview · simulated votes</span>
+    <div class="member"><label for="member">Demo member</label><select id="member"><option value="ada">Ada Morgan</option><option value="lin">Lin Park</option></select></div>
+  </div>
+  <header class="hero">
+    <div>
+      <p class="hero-label">Open Source Guild</p>
+      <h1>Decide together.</h1>
+      <p>Bring an idea to the table, hear from your guild, and keep a public record of what you decide.</p>
+      <button type="button" id="new" class="primary">＋ New proposal</button>
+    </div>
+    <div class="art" aria-hidden="true"><div class="ripple"></div><div class="ballot">✓</div><div class="box"><div class="slot"></div></div></div>
   </header>
-  <form id="proposal">
-    <div class="row">
-      <label for="member">Demo member</label>
-      <select id="member"><option>Ada</option><option>Lin</option></select>
-    </div>
-    <p><label for="title">New proposal</label></p>
-    <div class="row">
-      <input id="title" maxlength="100" required>
-      <button>Add proposal</button>
-    </div>
-  </form>
-  <p id="status" role="status" tabindex="-1"></p>
-  <section id="polls" aria-label="Proposals"></section>
-  <p><a href="https://github.com/Jeyloo2026/commons-board">Source code and Gno contract</a></p>
+  <section class="summary" aria-label="Board overview">
+    <div><strong id="open-count">0</strong><span>Open proposals</span></div>
+    <div><strong id="vote-count">0</strong><span>Votes cast</span></div>
+    <div><strong id="closed-count">0</strong><span>Closed decisions</span></div>
+  </section>
+  <section aria-labelledby="view-title">
+    <div class="section-head"><div><h2 id="view-title">Proposal board</h2><p id="view-note">Review ideas and cast your vote before the deadline.</p></div><span id="result-count"></span></div>
+    <p id="status" class="sr-only" role="status" tabindex="-1"></p>
+    <div id="proposals" class="grid"></div>
+  </section>
 </main>
-<script>
-const polls = [{ title:'Should we host a Go workshop next week?', votes:new Map() }];
-const list = document.querySelector('#polls');
-const member = document.querySelector('#member');
-const status = document.querySelector('#status');
-const title = document.querySelector('#title');
-const form = document.querySelector('#proposal');
-
-function draw() {
-  list.replaceChildren();
-  for (const poll of polls) {
-    const article = document.createElement('article');
-    article.className = 'poll';
-    const heading = document.createElement('h2');
-    heading.textContent = poll.title;
-    let yes = 0;
-    for (const vote of poll.votes.values()) yes += Number(vote);
-    const total = poll.votes.size;
-    const tally = document.createElement('p');
-    tally.textContent = `Yes ${yes} · No ${total - yes}`;
-    const meter = document.createElement('meter');
-    meter.max = total || 1;
-    meter.value = yes;
-    meter.setAttribute('aria-label', 'Yes votes as a share of total votes');
-    const actions = document.createElement('div');
-    actions.className = 'row';
-    for (const approve of [true, false]) {
-      const button = document.createElement('button');
-      button.textContent = approve ? 'Vote yes' : 'Vote no';
-      button.disabled = poll.votes.has(member.value);
-      button.onclick = () => {
-        poll.votes.set(member.value, approve);
-        status.textContent = `Vote recorded for ${member.value}.`;
-        draw();
-        status.focus();
-      };
-      actions.append(button);
-    }
-    article.append(heading, tally, meter, actions);
-    list.append(article);
-  }
-}
-
-member.onchange = () => {
-  status.textContent = '';
-  draw();
-};
-form.onsubmit = event => {
-  event.preventDefault();
-  const question = title.value.trim();
-  if (!question) {
-    status.textContent = 'Enter a proposal title.';
-    title.focus();
-    return;
-  }
-  polls.unshift({ title:question, votes:new Map() });
-  form.reset();
-  status.textContent = 'Proposal added.';
-  draw();
-  title.focus();
-};
-draw();
-</script>
+<dialog id="composer" aria-labelledby="composer-title">
+  <form id="proposal-form">
+    <h2 id="composer-title">New proposal</h2>
+    <label for="title">What should the guild decide?</label>
+    <input id="title" required maxlength="100" autofocus>
+    <label for="details">Context <span>(optional)</span></label>
+    <textarea id="details" maxlength="280" rows="3"></textarea>
+    <label for="duration">Voting window</label>
+    <select id="duration"><option value="1">1 minute · quick demo</option><option value="1440" selected>1 day</option><option value="4320">3 days</option><option value="10080">7 days</option></select>
+    <div class="actions"><button type="button" id="cancel">Cancel</button><button class="primary">Open voting</button></div>
+  </form>
+</dialog>
+<template id="poll-template">
+  <article class="poll">
+    <div class="poll-top"><span class="pill"></span><span class="deadline"></span></div>
+    <h3></h3><p class="description"></p>
+    <div class="meter" role="img"><span></span></div>
+    <div class="tally"><span class="yes"></span><span class="no"></span></div>
+    <div class="poll-actions"><button data-vote="yes">Vote yes</button><button data-vote="no">Vote no</button><p class="receipt" hidden></p></div>
+  </article>
+</template>
 </body>
 </html>
