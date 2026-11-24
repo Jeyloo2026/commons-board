@@ -18,7 +18,9 @@ jobs:
           mv gno_linux_amd64 gno
           chmod +x gno
           git clone --depth 1 --branch v1.8.0 https://github.com/gnolang/gno.git source
+          test -d source/gnovm/stdlibs/strconv
           echo "$RUNNER_TEMP/gno" >> "$GITHUB_PATH"
+          echo "GNOROOT=$RUNNER_TEMP/gno/source" >> "$GITHUB_ENV"
       - name: Test realm
         working-directory: commonsboard
         run: gno test -root-dir "$RUNNER_TEMP/gno/source" .
