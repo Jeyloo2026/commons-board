@@ -17,7 +17,8 @@ jobs:
           grep 'gno_linux_amd64$' CHECKSUMS.txt | sha256sum -c -
           mv gno_linux_amd64 gno
           chmod +x gno
+          git clone --depth 1 --branch v1.8.0 https://github.com/gnolang/gno.git source
           echo "$RUNNER_TEMP/gno" >> "$GITHUB_PATH"
       - name: Test realm
         working-directory: commonsboard
-        run: gno test .
+        run: gno test -root-dir "$RUNNER_TEMP/gno/source" .
