@@ -1,0 +1,23 @@
+name: Gno tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Gno v1.8.0
+        run: |
+          mkdir -p "$RUNNER_TEMP/gno"
+          cd "$RUNNER_TEMP/gno"
+          base=https://github.com/gnolang/gno/releases/download/v1.8.0
+          curl -fsSLO "$base/gno_linux_amd64"
+          curl -fsSLO "$base/CHECKSUMS.txt"
+          grep 'gno_linux_amd64$' CHECKSUMS.txt | sha256sum -c -
+          mv gno_linux_amd64 gno
+          chmod +x gno
+          echo "$RUNNER_TEMP/gno" >> "$GITHUB_PATH"
+      - name: Test realm
+        working-directory: commonsboard
+        run: gno test .
