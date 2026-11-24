@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Commons Board · Community decisions</title>
-<link rel="stylesheet" href="board.css">
+<link rel="stylesheet" href="board.css?v=3">
 <script defer src="board.js"></script>
 </head>
 <body>
@@ -21,7 +21,7 @@
 <main>
   <div class="toolbar">
     <span class="preview">● Browser preview · simulated votes</span>
-    <div class="member"><label for="member">Demo member</label><select id="member"><option value="ada">Ada Morgan</option><option value="lin">Lin Park</option></select></div>
+    <div class="member"><label for="member">Demo member</label><span class="member-icon" aria-hidden="true"></span><select id="member"><option value="ada">Ada Morgan</option><option value="lin">Lin Park</option></select></div>
   </div>
   <header class="hero">
     <div>
@@ -30,7 +30,7 @@
       <p>Bring an idea to the table, hear from your guild, and keep a public record of what you decide.</p>
       <button type="button" id="new" class="primary">＋ New proposal</button>
     </div>
-    <div class="art" aria-hidden="true"><div class="ripple"></div><div class="ballot">✓</div><div class="box"><div class="slot"></div></div></div>
+    <figure class="hero-art"><img src="assets/community-vote.jpg" alt="" width="768" height="512" fetchpriority="high"></figure>
   </header>
   <section class="summary" aria-label="Board overview">
     <div><strong id="open-count">0</strong><span>Open proposals</span></div>
